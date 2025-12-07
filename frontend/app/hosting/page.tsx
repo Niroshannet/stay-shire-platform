@@ -30,6 +30,7 @@ export default function HostingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {STATS.map((stat, idx) => (
                         <motion.div
+                            // Fixed: Using stat instead of state
                             key={stat.label}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
