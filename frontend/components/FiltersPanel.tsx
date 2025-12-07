@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Slider } from '@headlessui/react';
 import { X } from 'lucide-react';
 
 interface FiltersPanelProps {
@@ -112,8 +111,8 @@ export default function FiltersPanel({ onClose, onApply }: FiltersPanelProps) {
                                     key={type}
                                     onClick={() => handleTypeToggle(type)}
                                     className={`border rounded-xl p-4 cursor-pointer transition-all ${propertyTypes.includes(type)
-                                            ? 'border-indigo-500 bg-indigo-500/10'
-                                            : 'border-white/20 hover:border-white/40'
+                                        ? 'border-indigo-500 bg-indigo-500/10'
+                                        : 'border-white/20 hover:border-white/40'
                                         }`}
                                 >
                                     <div className="font-semibold text-white">{type}</div>
@@ -131,8 +130,8 @@ export default function FiltersPanel({ onClose, onApply }: FiltersPanelProps) {
                             {['Wifi', 'Kitchen', 'Washer', 'Dryer', 'AC', 'Heating', 'Pool', 'Gym', 'Parking'].map((amenity) => (
                                 <label key={amenity} className="flex items-center gap-3 cursor-pointer group">
                                     <div className={`w-6 h-6 rounded border flex items-center justify-center transition-colors ${amenities.includes(amenity)
-                                            ? 'bg-indigo-500 border-indigo-500 text-white'
-                                            : 'border-white/30 group-hover:border-white/50'
+                                        ? 'bg-indigo-500 border-indigo-500 text-white'
+                                        : 'border-white/30 group-hover:border-white/50'
                                         }`}>
                                         {amenities.includes(amenity) && <span className="text-sm">✓</span>}
                                     </div>
