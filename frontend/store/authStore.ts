@@ -19,6 +19,8 @@ interface AuthState {
     register: (data: RegisterData) => Promise<void>;
     logout: () => void;
     setUser: (user: User) => void;
+    setToken: (token: string) => void;
+    checkAuth: () => Promise<void>;
 }
 
 interface RegisterData {
@@ -90,6 +92,42 @@ export const useAuthStore = create<AuthState>()(
 
             setUser: (user: User) => {
                 set({ user });
+            },
+
+            setToken: (token: string) => {
+                localStorage.setItem('token', token);
+                set({ token, isAuthenticated: true });
+            },
+
+            checkAuth: async () => {
+                set({ isLoading: true });
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        set({ isLoading: false, isAuthenticated: false });
+                        return;
+                    }
+
+                    // Fetch user profile with the token
+                    const response = await apiClient.get('/api/auth/profile', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+
+                    set({
+                        user: response.data,
+                        token,
+                        isAuthenticated: true,
+                        isLoading: false,
+                    });
+                } catch (error) {
+                    localStorage.removeItem('token');
+                    set({
+                        user: null,
+                        token: null,
+                        isAuthenticated: false,
+                        isLoading: false,
+                    });
+                }
             },
         }),
         {
