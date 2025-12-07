@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  passwordHash    String?   @map("password_hash")
+  firstName       String?   @map("first_name")
+  lastName        String?   @map("last_name")
+  phone           String?
+  profilePhotoUrl String?   @map("profile_photo_url")
+  bio             String?
+  isHost          Boolean   @default(false) @map("is_host")
+  isVerified      Boolean   @default(false) @map("is_verified")
+  provider        String    @default("local")
+  socialId        String?   @map("social_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  properties      Property[]
+  bookingsAsGuest Booking[]  @relation("GuestBookings")
+  reviewsGiven    Review[]   @relation("ReviewsGiven")
+  reviewsReceived Review[]   @relation("ReviewsReceived")
+  messagesSent    Message[]  @relation("MessagesSent")
+  messagesReceived Message[] @relation("MessagesReceived")
+  wishlists       Wishlist[]
+
+  @@map("users")
+}
+
+model Property {
+  id            String   @id @default(uuid())
+  hostId        String   @map("host_id")
+  title         String
+  description   String?
+  propertyType  String   @map("property_type")
+  addressLine1  String?  @map("address_line1")
+  city          String?
+  state         String?
+  country       String?
+  postalCode    String?  @map("postal_code")
+  latitude      Decimal? @db.Decimal(10, 8)
+  longitude     Decimal? @db.Decimal(11, 8)
+  guestCapacity Int      @map("guest_capacity")
+  bedrooms      Int
+  beds          Int
+  bathrooms     Decimal  @db.Decimal(3, 1)
+  basePrice     Decimal  @map("base_price") @db.Decimal(10, 2)
+  cleaningFee   Decimal? @map("cleaning_fee") @db.Decimal(10, 2)
+  currency      String   @default("USD")
+  instantBook   Boolean  @default(false) @map("instant_book")
+  status        String   @default("draft")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  host              User              @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  photos            PropertyPhoto[]
+  propertyAmenities PropertyAmenity[]
+  bookings          Booking[]
+  reviews           Review[]
+  messages          Message[]
+  wishlistItems     WishlistItem[]
+
+  @@index([hostId])
+  @@index([latitude, longitude])
+  @@map("properties")
+}
+
+model PropertyPhoto {
+  id           String   @id @default(uuid())
+  propertyId   String   @map("property_id")
+  url          String
+  displayOrder Int      @map("display_order")
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("property_photos")
+}
+
+model Amenity {
+  id       String  @id @default(uuid())
+  name     String  @unique
+  category String?
+  icon     String?
+
+  propertyAmenities PropertyAmenity[]
+
+  @@map("amenities")
+}
+
+model PropertyAmenity {
+  propertyId String @map("property_id")
+  amenityId  String @map("amenity_id")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity  Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, amenityId])
+  @@map("property_amenities")
+}
+
+model Booking {
+  id                 String   @id @default(uuid())
+  propertyId         String   @map("property_id")
+  guestId            String   @map("guest_id")
+  checkIn            DateTime @map("check_in") @db.Date
+  checkOut           DateTime @map("check_out") @db.Date
+  guests             Int
+  status             String   @default("pending")
+  totalPrice         Decimal  @map("total_price") @db.Decimal(10, 2)
+  bookingFee         Decimal? @map("booking_fee") @db.Decimal(10, 2)
+  hostPayout         Decimal? @map("host_payout") @db.Decimal(10, 2)
+  cancellationPolicy String?  @map("cancellation_policy")
+  specialRequests    String?  @map("special_requests")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  property Property  @relation(fields: [propertyId], references: [id])
+  guest    User      @relation("GuestBookings", fields: [guestId], references: [id])
+  reviews  Review[]
+  payments Payment[]
+
+  @@index([propertyId])
+  @@index([guestId])
+  @@index([checkIn, checkOut])
+  @@map("bookings")
+}
+
+model Review {
+  id                   String   @id @default(uuid())
+  bookingId            String   @map("booking_id")
+  reviewerId           String   @map("reviewer_id")
+  revieweeId           String   @map("reviewee_id")
+  propertyId           String?  @map("property_id")
+  rating               Int
+  cleanlinessRating    Int?     @map("cleanliness_rating")
+  accuracyRating       Int?     @map("accuracy_rating")
+  communicationRating  Int?     @map("communication_rating")
+  locationRating       Int?     @map("location_rating")
+  valueRating          Int?     @map("value_rating")
+  comment              String?
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  booking  Booking   @relation(fields: [bookingId], references: [id])
+  reviewer User      @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewee User      @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+  property Property? @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+  @@map("reviews")
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  senderId       String   @map("sender_id")
+  recipientId    String   @map("recipient_id")
+  propertyId     String?  @map("property_id")
+  content        String
+  isRead         Boolean  @default(false) @map("is_read")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  sender    User      @relation("MessagesSent", fields: [senderId], references: [id])
+  recipient User      @relation("MessagesReceived", fields: [recipientId], references: [id])
+  property  Property? @relation(fields: [propertyId], references: [id])
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model Payment {
+  id              String   @id @default(uuid())
+  bookingId       String   @map("booking_id")
+  amount          Decimal  @db.Decimal(10, 2)
+  currency        String
+  paymentMethod   String   @map("payment_method")
+  paymentIntentId String?  @map("payment_intent_id")
+  status          String
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WishlistItem[]
+
+  @@map("wishlists")
+}
+
+model WishlistItem {
+  wishlistId String   @map("wishlist_id")
+  propertyId String   @map("property_id")
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@id([wishlistId, propertyId])
+  @@map("wishlist_items")
+}

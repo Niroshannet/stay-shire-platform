@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: stay-shire-postgres
+    environment:
+      POSTGRES_USER: stayshire
+      POSTGRES_PASSWORD: stayshire123
+      POSTGRES_DB: stayshire_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - stay-shire-network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: stay-shire-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - stay-shire-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stay-shire-backend
+    environment:
+      DATABASE_URL: postgresql://stayshire:stayshire123@postgres:5432/stayshire_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-secret-key-change-in-production
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - stay-shire-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stay-shire-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - stay-shire-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+networks:
+  stay-shire-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
