@@ -84,7 +84,7 @@ function SearchBar({ compact = false }: { compact?: boolean }) {
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                             placeholder="Search destinations"
-                            className="w-full bg-transparent border-none p-0 text-gray-900 placeholder-gray-500 focus:ring-0 text-sm truncate leading-5 font-medium"
+                            className="w-full bg-transparent border-none p-0 text-gray-900 placeholder-gray-500 focus:ring-0 focus:outline-none text-sm truncate leading-5 font-medium"
                             autoFocus={activeTab === 'location'}
                         />
                         {location && (
@@ -189,8 +189,8 @@ function SearchBar({ compact = false }: { compact?: boolean }) {
                             animate={{ opacity: 1, y: 0, scale: 1, x: activeTab === 'dates' ? '-50%' : '0%' }}
                             exit={{ opacity: 0, y: 10, scale: 0.95, x: activeTab === 'dates' ? '-50%' : '0%' }}
                             className={`absolute top-full mt-4 bg-white rounded-[32px] z-20 shadow-2xl overflow-hidden ${activeTab === 'guests' ? 'w-[400px] right-0' :
-                                    activeTab === 'dates' ? 'w-[760px] left-1/2' :
-                                        'w-full md:w-[450px]'
+                                activeTab === 'dates' ? 'w-[760px] left-1/2' :
+                                    'w-full md:w-[450px]'
                                 }`}
                             style={
                                 activeTab === 'guests' ? {} :

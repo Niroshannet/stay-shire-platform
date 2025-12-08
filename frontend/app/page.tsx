@@ -160,7 +160,7 @@ export default function Home() {
       <Header />
 
       <main className="flex-1 pt-52 pb-16">
-        <section className="max-w-[1920px] mx-auto px-4 xl:px-12">
+        <section className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
 
           {/* Section Header */}
           <div className="flex items-center justify-between mb-6">
@@ -201,7 +201,7 @@ export default function Home() {
 
         </section>
 
-        <section className="max-w-[1920px] mx-auto px-4 xl:px-12 mt-12">
+        <section className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 mt-12">
           {/* Section Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-[#222222] flex items-center gap-2 cursor-pointer hover:underline">

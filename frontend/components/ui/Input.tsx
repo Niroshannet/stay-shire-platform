@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-interface InputProps extends Omit<HTMLMotionProps<"input">, 'ref'> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
 }
@@ -15,11 +15,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         {label}
                     </label>
                 )}
-                <motion.input
+                <input
                     ref={ref}
                     className={`glass w-full px-4 py-3 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ${error ? 'ring-2 ring-red-500' : ''} ${className}`}
-                    whileFocus={{ scale: 1.01 }}
-                    transition={{ duration: 0.2 }}
                     {...props}
                 />
                 {error && (
