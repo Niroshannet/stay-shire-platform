@@ -3,8 +3,11 @@
 import Header from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PropertyCard } from '@/components/PropertyCard';
+import PropertyCardSkeleton from '@/components/PropertyCardSkeleton';
+import HeroSection from '@/components/HeroSection';
+import StatsSection from '@/components/StatsSection';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 // Mock data matching the screenshot
 const popularHomes = [
@@ -146,6 +149,13 @@ const parisHomes = [
 export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const parisScrollRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading for demo
+    const timer = setTimeout(() => setLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const scroll = (direction: 'left' | 'right', ref: React.RefObject<HTMLDivElement | null>) => {
     if (ref.current) {
@@ -159,7 +169,10 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
-      <main className="flex-1 pt-52 pb-16">
+      {/* Hero Section */}
+      <HeroSection />
+
+      <main className="flex-1 pb-16">
         <section className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
 
           {/* Section Header */}
@@ -192,11 +205,21 @@ export default function Home() {
             className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x"
             style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
           >
-            {popularHomes.map((property) => (
-              <div key={property.id} className="min-w-[170px] w-[170px] md:w-[190px] snap-start">
-                <PropertyCard {...property} />
-              </div>
-            ))}
+            {loading ? (
+              // Show skeletons while loading
+              [...Array(7)].map((_, i) => (
+                <div key={i} className="min-w-[170px] w-[170px] md:w-[190px] snap-start">
+                  <PropertyCardSkeleton />
+                </div>
+              ))
+            ) : (
+              // Show actual properties
+              popularHomes.map((property) => (
+                <div key={property.id} className="min-w-[170px] w-[170px] md:w-[190px] snap-start">
+                  <PropertyCard {...property} />
+                </div>
+              ))
+            )}
           </div>
 
         </section>
@@ -232,14 +255,25 @@ export default function Home() {
             className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x"
             style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
           >
-            {parisHomes.map((property) => (
-              <div key={property.id} className="min-w-[170px] w-[170px] md:w-[190px] snap-start">
-                <PropertyCard {...property} />
-              </div>
-            ))}
+            {loading ? (
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="min-w-[170px] w-[170px] md:w-[190px] snap-start">
+                  <PropertyCardSkeleton />
+                </div>
+              ))
+            ) : (
+              parisHomes.map((property) => (
+                <div key={property.id} className="min-w-[170px] w-[170px] md:w-[190px] snap-start">
+                  <PropertyCard {...property} />
+                </div>
+              ))
+            )}
           </div>
         </section>
       </main>
+
+      {/* Stats Section */}
+      <StatsSection />
 
       <Footer />
     </div>

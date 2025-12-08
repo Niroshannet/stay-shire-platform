@@ -73,9 +73,9 @@ function Header() {
                         ) : (
                             <button
                                 onClick={() => setIsHostModalOpen(true)}
-                                className="hidden md:block text-sm font-semibold text-gray-900 px-4 py-2 rounded-full hover:bg-gray-100 transition"
+                                className="hidden md:block text-sm font-semibold text-gray-900 px-4 py-2 rounded-full hover:bg-green-50 hover:text-green-700 transition-all duration-300"
                             >
-                                Become a host
+                                Start Earning Today
                             </button>
                         )}
 

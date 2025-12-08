@@ -24,6 +24,69 @@ const categories = [
     // Add more as needed matching structure page
 ];
 
+const mockProperties = [
+    {
+        id: '1',
+        title: 'Luxury Villa in Beverly Hills',
+        propertyType: 'Villa',
+        city: 'Los Angeles',
+        basePrice: 450,
+        averageRating: 4.95,
+        photos: [{ url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80' }],
+        host: { firstName: 'Sarah' }
+    },
+    {
+        id: '2',
+        title: 'Cozy Mountain Cabin',
+        propertyType: 'Cabin',
+        city: 'Aspen',
+        basePrice: 200,
+        averageRating: 4.8,
+        photos: [{ url: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&q=80' }],
+        host: { firstName: 'Mike' }
+    },
+    {
+        id: '3',
+        title: 'Modern Downtown Apartment',
+        propertyType: 'Apartment',
+        city: 'New York',
+        basePrice: 300,
+        averageRating: 4.9,
+        photos: [{ url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80' }],
+        host: { firstName: 'Jessica' }
+    },
+    {
+        id: '4',
+        title: 'Beachfront Bungalow',
+        propertyType: 'House',
+        city: 'Miami',
+        basePrice: 350,
+        averageRating: 4.85,
+        photos: [{ url: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80' }],
+        host: { firstName: 'David' }
+    },
+    {
+        id: '5',
+        title: 'Rustic Countryside Cottage',
+        propertyType: 'Cottage',
+        city: 'Cotswolds',
+        basePrice: 150,
+        averageRating: 4.92,
+        photos: [{ url: 'https://images.unsplash.com/photo-1472224371017-08207f84aaae?w=800&q=80' }],
+        host: { firstName: 'Emma' }
+    },
+    {
+        id: '6',
+        title: 'Charming City Loft',
+        propertyType: 'Apartment',
+        city: 'Paris',
+        basePrice: 220,
+        averageRating: 4.88,
+        photos: [{ url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80' }],
+        host: { firstName: 'Pierre' }
+    }
+];
+
 function SearchResults() {
     const searchParams = useSearchParams();
     const [properties, setProperties] = useState<any[]>([]);
@@ -41,7 +104,12 @@ function SearchResults() {
                 const response = await axios.get(`http://localhost:3001/api/properties?${params.toString()}`);
                 setProperties(response.data);
             } catch (error) {
-                console.error('Failed to fetch properties', error);
+                console.warn('Backend unavailable, using mock data');
+                // Fallback to mock data for demo
+                const filtered = selectedCategory
+                    ? mockProperties.filter(p => p.propertyType.toLowerCase().includes(selectedCategory))
+                    : mockProperties;
+                setProperties(filtered.length > 0 ? filtered : mockProperties);
             } finally {
                 setLoading(false);
             }
